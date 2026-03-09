@@ -1,30 +1,14 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from schemas import VoiceInput
+from agent import process_input
 
 app = FastAPI()
 
-# Enable CORS so Next.js can talk to FastAPI
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Define what a 'Company' looks like
-class Company(BaseModel):
-    name: str
-
 @app.get("/")
-def home():
-    return {"message": "Funding Assistant API is Live"}
+def root():
+    return {"status": "Pebble AI Intake API"}
 
-@app.post("/analyze-company")
-async def analyze_company(company: Company):
-    # This is where your AI logic will eventually go
-    return {
-        "received_name": company.name,
-        "status": "Processing application for " + company.name
-    }
+@app.post("/voice")
+async def voice_input(data: VoiceInput):
+    response = process_input(data.session_id, data.text)
+    return response
