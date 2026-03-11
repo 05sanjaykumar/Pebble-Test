@@ -1,4 +1,4 @@
-# agent/checklist.py
+# backend/agent/checklist.py
 def generate_documents(profile):
 
     docs = []

@@ -1,4 +1,4 @@
-# session_store.py
+# backend/session_store.py
 sessions = {}
 
 def get_session(session_id):

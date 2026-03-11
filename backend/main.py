@@ -1,14 +1,25 @@
-# main.py
+# backend/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from schemas import VoiceInput
 from session_store import get_session
-from agent.intake_agent import extract_profile
+from agent.intake_agent import extract_profile, next_question
 from agent.checklist import generate_documents
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.post("/intake")
 def intake(data: VoiceInput):
+
+    print("data", data)
 
     session = get_session(data.session_id)
 
@@ -22,8 +33,10 @@ def intake(data: VoiceInput):
 
     docs = generate_documents(session["profile"])
 
+    question = next_question(session["profile"])
+
     return {
         "profile": session["profile"],
         "documents": docs,
-        "next_question": "Tell me more about your funding needs."
+        "next_question": question
     }
