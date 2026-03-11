@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from "react";
 import { 
   Mic, 
   Building2, 
@@ -11,6 +12,30 @@ import {
 } from 'lucide-react';
 
 export default function FundingAssistant() {
+
+  const [profile, setProfile] = useState({});
+  const [documents, setDocuments] = useState([]);
+
+  async function sendMessage(text: string) {
+
+  const res = await fetch("http://localhost:8000/intake", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      session_id: "demo",
+      text
+    })
+  });
+
+  const data = await res.json();
+
+  setProfile(data.profile);
+  setDocuments(data.documents);
+}
+
+
   return (
     // h-screen and overflow-hidden prevent the whole page from scrolling
     <div className="h-screen flex flex-col bg-slate-50 p-6 md:p-8 font-sans text-slate-900 overflow-hidden">
