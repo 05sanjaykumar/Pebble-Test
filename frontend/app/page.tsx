@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { useState } from "react";
 import { 
@@ -15,26 +17,69 @@ export default function FundingAssistant() {
 
   const [profile, setProfile] = useState({});
   const [documents, setDocuments] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
 
   async function sendMessage(text: string) {
 
-  const res = await fetch("http://localhost:8000/intake", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      session_id: "demo",
-      text
-    })
-  });
+    setMessages(prev => [...prev, { role: "user", text }]);
 
-  const data = await res.json();
+    const res = await fetch("http://localhost:8000/intake", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        session_id: "demo",
+        text
+      })
+    });
 
-  setProfile(data.profile);
-  setDocuments(data.documents);
-}
+    const data = await res.json();
 
+    setProfile(data.profile);
+    setDocuments(data.documents);
+
+    setMessages(prev => [
+      ...prev,
+      { role: "assistant", text: data.next_question }
+    ]);
+  }
+
+  function startListening() {
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Speech Recognition not supported in this browser");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+      console.log("🎤 Listening...");
+    };
+
+    recognition.onresult = async (event: any) => {
+      const transcript = event.results[0][0].transcript;
+
+      console.log("User said:", transcript);
+
+      await sendMessage(transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech error:", event.error);
+    };
+
+    recognition.start();
+  }
 
   return (
     // h-screen and overflow-hidden prevent the whole page from scrolling
@@ -62,17 +107,26 @@ export default function FundingAssistant() {
 
           {/* Chat Body - This area alone will scroll if text is long */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
-            <div className="max-w-[80%] bg-white border border-slate-100 p-4 rounded-2xl rounded-tl-none shadow-sm">
-              <p className="text-sm text-slate-700 leading-relaxed">
-                Hi! I'm your Funding Assistant. I'll help collect some information about your business. 
-                Let's get started — what is the name of your company?
-              </p>
-            </div>
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+                  msg.role === "user"
+                    ? "bg-blue-600 text-white ml-auto"
+                    : "bg-white border border-slate-100"
+                }`}
+              >
+                <p className="text-sm">{msg.text}</p>
+              </div>
+            ))}
+
           </div>
 
           {/* Chat Input Area */}
           <div className="p-4 border-t border-slate-50 flex justify-center shrink-0">
-            <button className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md transition-all active:scale-95">
+            <button 
+            onClick={startListening}
+            className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md transition-all active:scale-95">
               <Mic size={20} />
             </button>
           </div>
