@@ -43,6 +43,8 @@ export default function FundingAssistant() {
       ...prev,
       { role: "assistant", text: data.next_question }
     ]);
+
+    speak(data.next_question);
   }
 
   function startListening() {
@@ -81,6 +83,24 @@ export default function FundingAssistant() {
     recognition.start();
   }
 
+  function speak(text: string) {
+    speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(text)
+
+    const voices = speechSynthesis.getVoices()
+
+    const preferred =
+      voices.find(v => v.name.includes("Google US English")) ||
+      voices.find(v => v.name.includes("Samantha")) ||
+      voices[0]
+
+    utterance.voice = preferred
+    utterance.rate = 1
+    utterance.pitch = 1
+
+    speechSynthesis.speak(utterance)
+  }
   return (
     // h-screen and overflow-hidden prevent the whole page from scrolling
     <div className="h-screen flex flex-col bg-slate-50 p-6 md:p-8 font-sans text-slate-900 overflow-hidden">
