@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { 
   Mic, 
   Building2, 
@@ -18,6 +18,7 @@ export default function FundingAssistant() {
   const [profile, setProfile] = useState({});
   const [documents, setDocuments] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const recognitionRef = useRef<any>(null)
 
   async function sendMessage(text: string) {
 
@@ -62,7 +63,10 @@ export default function FundingAssistant() {
 
     recognition.lang = "en-US";
     recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.continuous = true;
+
+    recognitionRef.current = recognition
+
 
     recognition.onstart = () => {
       console.log("🎤 Listening continuously...")
@@ -83,8 +87,10 @@ export default function FundingAssistant() {
     }
 
     recognition.onend = () => {
-      console.log("Restarting listening...")
-      recognition.start()
+      if (!speechSynthesis.speaking) {
+        console.log("Restarting listening...")
+        recognition.start()
+      }
     }
 
     recognition.start()
@@ -95,15 +101,13 @@ export default function FundingAssistant() {
     speechSynthesis.cancel();
 
     // stop mic while assistant speaks
-    // recognitionRef.current?.stop();
+    recognitionRef.current?.stop();
 
     const utterance = new SpeechSynthesisUtterance(text);
 
     const voices = speechSynthesis.getVoices();
 
     const preferred =
-      voices.find(v => v.name.includes("Google US English")) ||
-      voices.find(v => v.name.includes("Samantha")) ||
       voices.find(v => v.name.includes("Alex")) ||
       voices[0];
 
@@ -111,16 +115,20 @@ export default function FundingAssistant() {
     utterance.rate = 0.95;
     utterance.pitch = 1;
 
+    utterance.onstart = () => {
+      console.log("Assistant speaking...");
+    }
+
     utterance.onend = () => {
 
       console.log("Assistant finished speaking");
 
-      // resume listening after speaking
-      // recognitionRef.current?.start();
+      if (!speechSynthesis.speaking) {
+        recognitionRef.current?.start();
+      }
     };
 
     speechSynthesis.speak(utterance);
-
   }
   return (
     // h-screen and overflow-hidden prevent the whole page from scrolling
