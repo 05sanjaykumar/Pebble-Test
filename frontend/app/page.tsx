@@ -65,41 +65,62 @@ export default function FundingAssistant() {
     recognition.continuous = false;
 
     recognition.onstart = () => {
-      console.log("🎤 Listening...");
-    };
+      console.log("🎤 Listening continuously...")
+    }
 
     recognition.onresult = async (event: any) => {
-      const transcript = event.results[0][0].transcript;
 
-      console.log("User said:", transcript);
+      const transcript =
+        event.results[event.results.length - 1][0].transcript
 
-      await sendMessage(transcript);
-    };
+      console.log("User said:", transcript)
+
+      await sendMessage(transcript)
+    }
 
     recognition.onerror = (event: any) => {
-      console.error("Speech error:", event.error);
-    };
+      console.error("Speech error:", event.error)
+    }
 
-    recognition.start();
+    recognition.onend = () => {
+      console.log("Restarting listening...")
+      recognition.start()
+    }
+
+    recognition.start()
   }
 
   function speak(text: string) {
-    speechSynthesis.cancel()
 
-    const utterance = new SpeechSynthesisUtterance(text)
+    speechSynthesis.cancel();
 
-    const voices = speechSynthesis.getVoices()
+    // stop mic while assistant speaks
+    // recognitionRef.current?.stop();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    const voices = speechSynthesis.getVoices();
 
     const preferred =
       voices.find(v => v.name.includes("Google US English")) ||
       voices.find(v => v.name.includes("Samantha")) ||
-      voices[0]
+      voices.find(v => v.name.includes("Alex")) ||
+      voices[0];
 
-    utterance.voice = preferred
-    utterance.rate = 1
-    utterance.pitch = 1
+    utterance.voice = preferred;
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
 
-    speechSynthesis.speak(utterance)
+    utterance.onend = () => {
+
+      console.log("Assistant finished speaking");
+
+      // resume listening after speaking
+      // recognitionRef.current?.start();
+    };
+
+    speechSynthesis.speak(utterance);
+
   }
   return (
     // h-screen and overflow-hidden prevent the whole page from scrolling
