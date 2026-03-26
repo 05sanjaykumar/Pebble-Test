@@ -3,8 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import VoiceInput
 from session_store import get_session
-from agent.intake_agent import extract_profile, next_question
+from agent.intake_agent import extract_profile, next_question, generate_response
 from agent.checklist import generate_documents
+
 
 app = FastAPI()
 
@@ -35,8 +36,15 @@ def intake(data: VoiceInput):
 
     question = next_question(session["profile"])
 
+    response_text = generate_response(
+        data.text,
+        session["profile"],
+        question
+    )
+
+
     return {
         "profile": session["profile"],
         "documents": docs,
-        "next_question": question
+        "next_question": response_text
     }
