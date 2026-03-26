@@ -18,7 +18,7 @@ app.add_middleware(
 
 @app.post("/intake")
 def intake(data: VoiceInput):
-
+    
     print("data", data)
 
     session = get_session(data.session_id)

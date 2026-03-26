@@ -1,7 +1,7 @@
 # Run the code
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000
 ```
 
 # API Endpoints
