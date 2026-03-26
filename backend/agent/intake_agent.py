@@ -59,6 +59,35 @@ def next_question(profile):
 
     return "Thanks! We have collected all the required information."
 
+def generate_response(user_text, profile, next_q):
+
+    prompt = f"""
+    You are a friendly lending assistant.
+
+    Your job:
+    - Acknowledge the user's input naturally
+    - Sound warm and conversational
+    - Then ask the next question
+
+    User said: "{user_text}"
+
+    Current collected profile:
+    {profile}
+
+    Next question to ask:
+    "{next_q}"
+
+    Respond like a human (not robotic).
+    Keep it short (2-3 sentences max).
+    """
+
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response.choices[0].message.content.strip()
+
 
 def extract_profile(text):
 
