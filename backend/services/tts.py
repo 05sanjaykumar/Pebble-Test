@@ -1,32 +1,35 @@
+# backend/services/tts.py
+
 import os
 import requests
-
 from dotenv import load_dotenv
+
 load_dotenv()
 
-ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-VOICE_ID = "gE0owC0H9C8SzfDyIUtB"  
+CARTESIA_API_KEY = os.getenv("CARTESIA_API_KEY")
 
 def generate_tts(text: str) -> bytes:
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
+    url = "https://api.cartesia.ai/tts"
 
     response = requests.post(
         url,
         headers={
-            "xi-api-key": ELEVENLABS_API_KEY,
-            "Content-Type": "application/json",
-            "Accept": "audio/mpeg" 
+            "Authorization": f"Bearer {CARTESIA_API_KEY}",
+            "Content-Type": "application/json"
         },
         json={
-            "text": text,
-            "model_id": "eleven_turbo_v2"
+            "model": "sonic",  # Cartesia default model
+            "voice": {
+                "mode": "id",
+                "id": "en-US-male-1"  # you can change later
+            },
+            "input": text,
+            "format": "mp3"
         }
     )
 
-    print("STATUS:", response.status_code)
-    print("CONTENT TYPE:", response.headers.get("content-type"))
-    print("SIZE:", len(response.content))
-
-    print("ERROR RESPONSE:", response.text)
+    if response.status_code != 200:
+        print("CARTESIA ERROR:", response.text)
+        return b""
 
     return response.content
