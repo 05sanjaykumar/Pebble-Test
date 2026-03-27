@@ -1,3 +1,4 @@
+// app/hooks/useSpeech.ts
 import { useRef } from "react";
 
 export function useSpeech(onResult: (text: string) => void) {

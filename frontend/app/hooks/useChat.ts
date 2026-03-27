@@ -1,3 +1,4 @@
+// app/hooks/useChat.ts
 import { useState } from "react";
 import { sendToBackend } from "../services/api";
 
