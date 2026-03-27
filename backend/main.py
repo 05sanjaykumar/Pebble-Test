@@ -19,8 +19,6 @@ app.add_middleware(
 
 @app.post("/intake")
 def intake(data: VoiceInput):
-    
-    print("data", data)
 
     session = get_session(data.session_id)
 
@@ -31,7 +29,7 @@ def intake(data: VoiceInput):
     session["profile"].update(
         {k: v for k, v in extracted.items() if v}
     )
-
+    
     docs = generate_documents(session["profile"])
 
     question = next_question(session["profile"])
