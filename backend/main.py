@@ -6,6 +6,9 @@ from session_store import get_session
 from agent.intake_agent import extract_profile, next_question, generate_response
 from agent.checklist import generate_documents
 
+from services.stt import transcribe_audio
+from services.tts import generate_tts
+
 
 app = FastAPI()
 
