@@ -1,10 +1,10 @@
+// app/components/Chat.tsx
 import { Mic } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 
 export default function Chat({ messages, startListening }: any) {
   return (
     <div className="flex flex-col bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full">
-      
       {/* Header */}
       <div className="p-3 border-b flex items-center gap-2">
         <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>

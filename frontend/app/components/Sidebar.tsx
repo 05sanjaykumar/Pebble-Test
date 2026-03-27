@@ -1,3 +1,4 @@
+// app/components/Sidebar.tsx
 import { Building2, Factory, DollarSign, TrendingUp, Wallet, Target, Circle } from "lucide-react";
 
 export default function Sidebar({ profile, documents }: any) {

@@ -1,3 +1,5 @@
+// app/components/MessageBubble.tsx
+
 export default function MessageBubble({ msg }: any) {
   return (
     <div
