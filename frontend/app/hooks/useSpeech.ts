@@ -19,7 +19,11 @@ export function useSpeech(onResponse: (data: any) => void) {
       };
 
       mediaRecorder.onstop = async () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach(track => track.stop()); // 🔥 stop mic
+
+        const blob = new Blob(chunksRef.current, {
+          type: "audio/webm;codecs=opus"
+        });
 
         const formData = new FormData();
         formData.append("file", blob);
@@ -31,6 +35,10 @@ export function useSpeech(onResponse: (data: any) => void) {
             body: formData,
           }
         );
+
+        if (!res.ok) {
+          throw new Error("Voice API failed");
+        }
 
         const data = await res.json();
 
@@ -47,7 +55,11 @@ export function useSpeech(onResponse: (data: any) => void) {
   }
 
   function playAudio(url: string) {
-    new Audio(url).play();
+    const audio = new Audio(url);
+
+    audio.play().catch((err) => {
+      console.error("Audio play failed:", err);
+    });
   }
 
   return { startListening, playAudio };

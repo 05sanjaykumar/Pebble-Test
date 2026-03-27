@@ -16,6 +16,7 @@ from services.tts import generate_tts
 
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.post("/intake")
 def intake(data: VoiceInput):
@@ -90,6 +90,8 @@ async def voice(file: UploadFile = File(...)):
     # 5. Save audio
     os.makedirs("static", exist_ok=True)
     file_path = "static/response.mp3"
+
+    print("AUDIO URL:", f"http://localhost:8000/{file_path}")
 
     with open(file_path, "wb") as f:
         f.write(audio_bytes)
