@@ -7,12 +7,14 @@ import { useSpeech } from "./hooks/useSpeech";
 import { useChat } from "./hooks/useChat";
 
 export default function Page() {
-  const { startListening, speak } = useSpeech(handleSpeech);
-  const { messages, sendMessage, profile, documents } = useChat(speak);
 
-  function handleSpeech(text: string) {
-    sendMessage(text);
-  }
+
+  const { messages, sendMessage, profile, documents, handleVoiceResponse } = useChat();
+
+  const { startListening, playAudio } = useSpeech((data) => {
+    handleVoiceResponse(data);
+    playAudio(data.audio_url);
+  });
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 p-6 md:p-8 font-sans text-slate-900 overflow-hidden">
