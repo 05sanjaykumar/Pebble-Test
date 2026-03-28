@@ -3,7 +3,6 @@ def generate_documents(profile):
 
     docs = []
 
-    revenue = profile.get("revenue")
     funding = profile.get("funding_amount")
 
     docs.append("Bank statements (12 months)")

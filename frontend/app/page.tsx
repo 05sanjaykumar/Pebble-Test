@@ -8,8 +8,7 @@ import { useChat } from "./hooks/useChat";
 
 export default function Page() {
 
-
-  const { messages, sendMessage, profile, documents, handleVoiceResponse } = useChat();
+  const { messages, profile, documents, handleVoiceResponse } = useChat();
 
   const { startListening, playAudio } = useSpeech((data) => {
     handleVoiceResponse(data);
