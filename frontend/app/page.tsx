@@ -10,9 +10,11 @@ export default function Page() {
 
   const { messages, profile, documents, handleVoiceResponse } = useChat();
 
-  const { startListening } = useSpeech((data) => {
+  function whenBackendResponds(data: any) {
     handleVoiceResponse(data);
-  });
+  }
+
+  const { startListening } = useSpeech(whenBackendResponds);
 
   return (
     <div className="h-screen flex flex-col bg-slate-50 p-6 md:p-8 font-sans text-slate-900 overflow-hidden">

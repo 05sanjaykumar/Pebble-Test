@@ -13,6 +13,9 @@ export function useChat() {
       { role: "assistant", text: data.assistant_text }
     ]);
 
+
+    // console.log("data handled by the frontend", data);
+
     setProfile(data.profile);
     setDocuments(data.documents);
   }

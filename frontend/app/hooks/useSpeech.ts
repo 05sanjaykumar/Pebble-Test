@@ -1,7 +1,7 @@
 // app/hooks/useSpeech.ts
 import { useRef } from "react";
 
-export function useSpeech(onResponse: (data: any) => void) {
+export function useSpeech(whenBackendResponds: (data: any) => void) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -42,11 +42,10 @@ export function useSpeech(onResponse: (data: any) => void) {
 
         const data = await res.json();
 
-        onResponse(data);
+        whenBackendResponds(data);
 
-        // ✅ play audio, then auto listen again after it finishes
         playAudio(data.audio_url, () => {
-          startListening(); // 🔁 loop back
+          startListening();
         });
       };
 
@@ -59,7 +58,6 @@ export function useSpeech(onResponse: (data: any) => void) {
     }
   }
 
-  // ✅ onEnded callback added so we know when audio finishes
   function playAudio(url: string, onEnded?: () => void) {
     const audio = new Audio(url);
 
@@ -68,9 +66,9 @@ export function useSpeech(onResponse: (data: any) => void) {
     });
 
     if (onEnded) {
-      audio.onended = onEnded; // fires when mp3 finishes playing
+      audio.onended = onEnded;
     }
   }
 
-  return { startListening};
+  return { startListening };
 }
