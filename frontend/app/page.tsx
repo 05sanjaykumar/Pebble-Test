@@ -10,9 +10,8 @@ export default function Page() {
 
   const { messages, profile, documents, handleVoiceResponse } = useChat();
 
-  const { startListening, playAudio } = useSpeech((data) => {
+  const { startListening } = useSpeech((data) => {
     handleVoiceResponse(data);
-    playAudio(data.audio_url);
   });
 
   return (
