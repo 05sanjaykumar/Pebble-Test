@@ -92,7 +92,8 @@ async def voice(file: UploadFile = File(...)):
 
     # 5. Save audio
     os.makedirs("static", exist_ok=True)
-    file_path = "static/response.mp3"
+    file_name = f"response_{uuid.uuid4().hex}.mp3"
+    file_path = f"static/{file_name}"
 
     print("AUDIO URL:", f"http://localhost:8000/{file_path}")
 
