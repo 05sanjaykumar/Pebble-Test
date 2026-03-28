@@ -14,6 +14,9 @@ import os
 from services.stt import transcribe_audio
 from services.tts import generate_tts
 
+import uuid
+
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -98,7 +101,8 @@ async def voice(file: UploadFile = File(...)):
 
     # 6. Return everything
     return {
-        "text": user_text,
+        "user_text": user_text,
+        "assistant_text": response_text,
         "audio_url": f"http://localhost:8000/{file_path}",
         "profile": session["profile"],
         "documents": docs

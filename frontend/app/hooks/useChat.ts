@@ -13,8 +13,8 @@ export function useChat() {
    function handleVoiceResponse(data: any) {
     setMessages(prev => [
       ...prev,
-      { role: "user", text: data.text },
-      { role: "assistant", text: data.next_question }
+      { role: "user", text: data.user_text },
+      { role: "assistant", text: data.assistant_text }
     ]);
 
     setProfile(data.profile);
