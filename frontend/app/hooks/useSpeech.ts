@@ -19,7 +19,7 @@ export function useSpeech(onResponse: (data: any) => void) {
       };
 
       mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(track => track.stop()); // 🔥 stop mic
+        stream.getTracks().forEach(track => track.stop());
 
         const blob = new Blob(chunksRef.current, {
           type: "audio/webm;codecs=opus"
@@ -43,6 +43,11 @@ export function useSpeech(onResponse: (data: any) => void) {
         const data = await res.json();
 
         onResponse(data);
+
+        // ✅ play audio, then auto listen again after it finishes
+        playAudio(data.audio_url, () => {
+          startListening(); // 🔁 loop back
+        });
       };
 
       mediaRecorder.start();
@@ -54,12 +59,17 @@ export function useSpeech(onResponse: (data: any) => void) {
     }
   }
 
-  function playAudio(url: string) {
+  // ✅ onEnded callback added so we know when audio finishes
+  function playAudio(url: string, onEnded?: () => void) {
     const audio = new Audio(url);
 
     audio.play().catch((err) => {
       console.error("Audio play failed:", err);
     });
+
+    if (onEnded) {
+      audio.onended = onEnded; // fires when mp3 finishes playing
+    }
   }
 
   return { startListening, playAudio };
