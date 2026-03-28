@@ -4,3 +4,4 @@ backend/.env
 backend/services/__pycache__
 backend/__pycache__
 backend/static
+backend/agent/__pycache__
