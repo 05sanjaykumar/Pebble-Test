@@ -72,5 +72,5 @@ export function useSpeech(onResponse: (data: any) => void) {
     }
   }
 
-  return { startListening, playAudio };
+  return { startListening};
 }
