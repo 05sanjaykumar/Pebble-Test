@@ -160,7 +160,7 @@ Based on user inputs, required documents are suggested:
 ## ⚠️ Known Limitations
 
 * Session memory is in-memory (not persistent)
-* Fixed recording duration (~4 seconds)
+* Sometimes listen it's own audio and reply
 * No real-time streaming (batch processing)
 * Single-user session handling
 
