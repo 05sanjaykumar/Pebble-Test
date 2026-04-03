@@ -33,8 +33,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Base URL for serving audio files — set to Railway URL in production
-BASE_URL = os.getenv("RAILWAY_PUBLIC_URL", "http://localhost:8000")
+# ✅ Base URL for serving audio files — set to BACKEND URL in production
+BASE_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 @app.post("/voice")
 async def voice(file: UploadFile = File(...)):
