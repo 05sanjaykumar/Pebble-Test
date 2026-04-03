@@ -1,6 +1,7 @@
 # backend/agent/intake_agent.py
 
 import os
+import re
 from dotenv import load_dotenv
 from groq import Groq
 import json
@@ -8,7 +9,6 @@ import json
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 
 
 REQUIRED_FIELDS = [
@@ -52,15 +52,12 @@ Rules:
 """
 
 def next_question(profile):
-
     for field in REQUIRED_FIELDS:
         if field not in profile or not profile[field]:
             return FIELD_QUESTIONS[field]
-
     return "Thanks! We have collected all the required information."
 
 def generate_response(user_text, profile, next_q):
-
     prompt = f"""
     You are a friendly lending assistant.
 
@@ -90,20 +87,32 @@ def generate_response(user_text, profile, next_q):
 
 
 def extract_profile(text):
-
-    response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": text}
-        ]
-    )
-
-    content = response.choices[0].message.content
-
     try:
-        data = json.loads(content)
-    except:
-        data = {}
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": text}
+            ]
+        )
 
-    return data
+        content = response.choices[0].message.content
+
+        if not content:
+            return {}
+
+        # Strip markdown code fences if LLM wraps JSON in ```json ... ```
+        content = re.sub(r"^```(?:json)?\s*", "", content.strip())
+        content = re.sub(r"```\s*$", "", content.strip())
+
+        data = json.loads(content)
+
+        # Ensure we always return a dict
+        if not isinstance(data, dict):
+            return {}
+
+        return data
+
+    except Exception as e:
+        print(f"[extract_profile] failed: {e}")
+        return {}
