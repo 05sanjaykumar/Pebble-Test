@@ -20,6 +20,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
+
+# ✅ Create static dir before mounting — Railway has no static/ on fresh deploy
+os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ✅ Read allowed origins from env — supports both local dev and Vercel
