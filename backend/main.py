@@ -1,4 +1,3 @@
-# backend/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from session_store import get_session
@@ -14,17 +13,26 @@ from services.stt import transcribe_audio
 from services.tts import generate_tts
 
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# ✅ Read allowed origins from env — supports both local dev and Vercel
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[FRONTEND_URL, "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ Base URL for serving audio files — set to Railway URL in production
+BASE_URL = os.getenv("RAILWAY_PUBLIC_URL", "http://localhost:8000")
 
 @app.post("/voice")
 async def voice(file: UploadFile = File(...)):
@@ -53,7 +61,7 @@ async def voice(file: UploadFile = File(...)):
         question
     )
 
-    # 4. 🔊 TTS (ElevenLabs)
+    # 4. 🔊 TTS (Cartesia)
     audio_bytes = generate_tts(response_text)
 
     # 5. Save audio
@@ -61,7 +69,7 @@ async def voice(file: UploadFile = File(...)):
     file_name = f"response_{uuid.uuid4().hex}.mp3"
     file_path = f"static/{file_name}"
 
-    print("AUDIO URL:", f"http://localhost:8000/{file_path}")
+    print("AUDIO URL:", f"{BASE_URL}/{file_path}")
 
     with open(file_path, "wb") as f:
         f.write(audio_bytes)
@@ -70,7 +78,7 @@ async def voice(file: UploadFile = File(...)):
     return {
         "user_text": user_text,
         "assistant_text": response_text,
-        "audio_url": f"http://localhost:8000/{file_path}",
+        "audio_url": f"{BASE_URL}/{file_path}",
         "profile": session["profile"],
         "documents": docs
     }
